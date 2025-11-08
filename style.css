@@ -1,0 +1,56 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: #c8e6c9; 
+  font-family: Arial, sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+
+#game {
+  position: relative;
+  width: 800px;
+  height: 300px;
+  background: url("images/map.png") no-repeat center/cover;
+  border: 3px solid #2e7d32;
+  overflow: hidden;
+}
+
+
+#player {
+  position: absolute;
+  bottom: 50px;
+  left: 80px;
+  width: 60px;
+  height: 60px;
+  background: url("images/lapin_normal.png") no-repeat center/contain;
+  background-size: contain;
+}
+
+
+#obstacle {
+  position: absolute;
+  bottom: 50px;
+  right: -60px;
+  width: 60px;
+  height: 60px;
+  background: url("images/rocher.png") no-repeat center/contain;
+  background-size: contain;
+}
+
+
+#score {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  font-weight: bold;
+  color: #1b5e20;
+  font-size: 20px;
+}
