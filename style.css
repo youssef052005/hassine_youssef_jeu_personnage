@@ -31,7 +31,7 @@ body {
   to { background-position-x: -1000px; }
 }
 
-#rabbit {
+#rabbit{
   position: absolute;
   bottom: 40px;
   left: 80px;
@@ -43,8 +43,7 @@ body {
 
 #rabbit.crouch {
   background: url("images/lapin_accroupit.png") no-repeat center/contain;
-  height: 150px;
-  bottom: 0px;
+  transform: translateY(25px);
 }
 
 .jump {
