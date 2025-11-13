@@ -75,11 +75,11 @@ body {
 }
 .bird {
   position: absolute;
-  top: 430px;
+  top: 420px;
   width: 100px;
   height: 80px;
   background: url("images/oiseau.png") no-repeat center/contain;
-  animation: moveObstacle 3s linear forwards;
+  animation: moveBird 3s linear forwards;
 }
 
 @keyframes moveBird {
@@ -98,3 +98,43 @@ body {
   text-shadow: 2px 2px 4px #000;
   font-family: Arial, sans-serif;
 }
+#gameOverScreen {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.8);
+  color: #fff;
+  font-family: Arial, sans-serif;
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  z-index: 10;
+}
+
+#gameOverScreen h1 {
+  font-size: 64px;
+  margin: 0;
+  color: #f44336;
+  text-shadow: 3px 3px 6px #000;
+}
+
+#finalScore {
+  font-size: 28px;
+}
+
+#restartBtn {
+  background: #4caf50;
+  color: white;
+  font-size: 20px;
+  padding: 10px 30px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+#restartBtn:hover {
+  background: #66bb6a;
+}
+
