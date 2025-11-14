@@ -29,7 +29,7 @@ Pendant le développement
 - Synchroniser les animations CSS et la suppression de l’élément obstacle en JavaScript.
 - Visuellement aligner le lapin, les rochers, les oiseaux et la terre pour que le jeu soit plus fluide.
 - Gérer les états du jeu : le personnage qui saute, le personnage qui s’accroupit, personnage qui évite un obstacle, personnage qui touche l’obstacle et Fin du jeu.
--Détection des collisions : ajuster la hitbox du lapin et des obstacles pour que les collisions soient justes et naturelles. 
+- Détection des collisions : ajuster la hitbox du lapin et des obstacles pour que les collisions soient justes et naturelles. 
 - Assurer la compatibilité entre navigateurs (performance, animations fluides).
 ## Solutions apportées
 - Utilisation de l’événement `animationend` pour retirer un obstacle exactement à la fin de l’animation.
