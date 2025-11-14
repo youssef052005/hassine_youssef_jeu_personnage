@@ -1,140 +1,177 @@
 * {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+ margin: 0;
+ padding: 0;
+ box-sizing: border-box;
 }
 
 body {
-  background-color: #c8e6c9;
-  font-family: Arial, sans-serif;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
+ background-color: #c8e6c9;
+ font-family: Arial, sans-serif;
+ display: flex;
+ justify-content: center;
+ align-items: center;
+ height: 100vh;
 }
 
 #game {
-  position: relative;
-  width: 80%;
-  max-width: 1000px;
-  height: 600px;
-  overflow: hidden;
-  border: 3px solid #2e7d32;
-  border-bottom: 3px solid #4a3b18;
-  background: url("images/map.png") repeat-x;
-  background-size: cover;
-  animation: scrollBackground 8s linear infinite;
+ position: relative;
+ width: 80%;
+ max-width: 1000px;
+ height: 600px;
+ overflow: hidden;
+ border: 3px solid #2e7d32;
+ border-bottom: 3px solid #4a3b18;
+ background: url("images/map.png") repeat-x;
+ background-size: cover;
+ animation: scrollBackground 8s linear infinite;
 }
 
 @keyframes scrollBackground {
-  from { background-position-x: 0; }
-  to { background-position-x: -1000px; }
+ from { background-position-x: 0; }
+ to { background-position-x: -1000px; }
+}
+
+#startMenu {
+ position: absolute;
+ inset: 0;
+ background: rgba(0, 0, 0, 0.9);
+ color: #fff;
+ font-family: Arial, sans-serif;
+ display: flex;
+ flex-direction: column;
+ justify-content: center;
+ align-items: center;
+ gap: 25px;
+ z-index: 20;
+}
+
+#startMenu h1 {
+ font-size: 50px;
+ color: #66bb6a;
+}
+
+#startMenu p {
+ font-size: 22px;
+}
+
+#startBtn {
+ background: #4caf50;
+ color: white;
+ font-size: 24px;
+ padding: 12px 40px;
+ border: none;
+ border-radius: 10px;
+ cursor: pointer;
+ transition: 0.3s;
+}
+
+#startBtn:hover {
+ background: #66bb6a;
 }
 
 #rabbit{
-  position: absolute;
-  bottom: 40px;
-  left: 80px;
-  width: 110px;
-  height: 110px;
-  background: url("images/lapin_normal.png") no-repeat center/contain;
-  transition: bottom 0.2s ease;
+ position: absolute;
+ bottom: 40px;
+ left: 80px;
+ width: 110px;
+ height: 110px;
+ background: url("images/lapin_normal.png") no-repeat center/contain;
+ transition: bottom 0.2s ease;
 }
 
 #rabbit.crouch {
-  background: url("images/lapin_accroupit.png") no-repeat center/contain;
-  transform: translateY(25px);
+ background: url("images/lapin_accroupit.png") no-repeat center/contain;
+ transform: translateY(25px);
 }
 #rabbit.jump {
-  background: url("images/lapin_courant.png") no-repeat center/contain;
-  width: 150px;
-  height: 150px;
+ background: url("images/lapin_courant.png") no-repeat center/contain;
+ width: 150px;
+ height: 150px;
 }
 .jump {
-  animation: jump 0.6s ease-out;
+ animation: jump 0.6s ease-out;
 }
 
 @keyframes jump {
-  0% { bottom: 20px; }
-  50% { bottom: 170px; }
-  100% { bottom: 20px; }
+ 0% { bottom: 20px; }
+ 50% { bottom: 170px; }
+ 100% { bottom: 20px; }
 }
 
 .obstacle { 
-  position: absolute;
-  bottom: 20px;
-  width: 95px;
-  height: 95px;
-  background: url("images/rocher.png") no-repeat center/contain;
-  animation: moveObstacle 3s linear forwards;
+ position: absolute;
+ bottom: 20px;
+ width: 95px;
+ height: 95px;
+ background: url("images/rocher.png") no-repeat center/contain;
+ animation: moveObstacle 3s linear forwards;
 }
 
 @keyframes moveObstacle {
-  from { right: -80px; }
-  to { right: 100%; }
+ from { right: -80px; }
+ to { right: 100%; }
 }
 .bird {
-  position: absolute;
-  top: 420px;
-  width: 100px;
-  height: 80px;
-  background: url("images/oiseau.png") no-repeat center/contain;
-  animation: moveBird 3s linear forwards;
+ position: absolute;
+ top: 420px;
+ width: 100px;
+ height: 80px;
+ background: url("images/oiseau.png") no-repeat center/contain;
+ animation: moveBird 3s linear forwards;
 }
 
 @keyframes moveBird {
-  from { right: -120px; }
-  to { right: 100%; }
+ from { right: -120px; }
+ to { right: 100%; }
 }
 
 
 #score {
-  position: absolute;
-  top: 10px;
-  left: 20px;
-  color: #fff;
-  font-size: 24px;
-  font-weight: bold;
-  text-shadow: 2px 2px 4px #000;
-  font-family: Arial, sans-serif;
+ position: absolute;
+ top: 10px;
+ left: 20px;
+ color: #fff;
+ font-size: 24px;
+ font-weight: bold;
+ text-shadow: 2px 2px 4px #000;
+ font-family: Arial, sans-serif;
 }
 #gameOverScreen {
-  position: absolute;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.8);
-  color: #fff;
-  font-family: Arial, sans-serif;
-  display: none;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  gap: 20px;
-  z-index: 10;
+ position: absolute;
+ inset: 0;
+ background: rgba(0, 0, 0, 0.8);
+ color: #fff;
+ font-family: Arial, sans-serif;
+ display: none;
+ flex-direction: column;
+ justify-content: center;
+ align-items: center;
+ gap: 20px;
+ z-index: 10;
 }
 
 #gameOverScreen h1 {
-  font-size: 64px;
-  margin: 0;
-  color: #f44336;
-  text-shadow: 3px 3px 6px #000;
+ font-size: 64px;
+ margin: 0;
+ color: #f44336;
+ text-shadow: 3px 3px 6px #000;
 }
 
 #finalScore {
-  font-size: 28px;
+ font-size: 28px;
 }
 
 #restartBtn {
-  background: #4caf50;
-  color: white;
-  font-size: 20px;
-  padding: 10px 30px;
-  border: none;
-  border-radius: 10px;
-  cursor: pointer;
-  transition: 0.3s;
+ background: #4caf50;
+ color: white;
+ font-size: 20px;
+ padding: 10px 30px;
+ border: none;
+ border-radius: 10px;
+ cursor: pointer;
+ transition: 0.3s;
 }
 
 #restartBtn:hover {
-  background: #66bb6a;
+ background: #66bb6a;
 }
-

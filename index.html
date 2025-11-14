@@ -5,20 +5,26 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Jeu du parcour</title>
   <link rel="stylesheet" href="style.css">
-</head>
-<body>
+  </head>
+  <body>
   
   <div id="game">
+    <div id="startMenu">
+      <h1>Le Lapin Coureur 🥕</h1>
+      <p>Appuyez sur ESPACE ou la flèche HAUT pour sauter.</p>
+    <button id="startBtn">Commencer</button>
+    </div>
+
     <div id="rabbit"></div>
     <div id="obstacle"></div>
     <div id="score">Score : 0</div>
     <div id="gameOverScreen">
-      <h1>Game Over</h1>
-      <p id="finalScore"></p>
-      <button id="restartBtn">Rejouer</button>
+    <h1>Game Over</h1>
+    <p id="finalScore"></p>
+    <button id="restartBtn">Rejouer</button>
     </div>
 
   </div>
   <script src="script.js"></script>
-</body>
+  </body>
 </html>
