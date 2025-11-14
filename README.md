@@ -41,5 +41,3 @@ Pendant le développement
 *Projet réalisé par Youssef Hassine
 
 *Date de rendu : [14/11/2025] ​‍​‌‍​‍‌
-*Projet réalisé par Youssef Hassine
-*Date de rendu : [14/11/2025] ​‍​‌‍​‍‌
