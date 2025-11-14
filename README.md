@@ -34,8 +34,8 @@ Pendant le développement
 ## Solutions apportées
 - Utilisation de l’événement `animationend` pour retirer un obstacle exactement à la fin de l’animation.
 - Ajuster les propriétés CSS de positionnement (`bottom`, `top`) et les dimensions pour que tout s’aligne.
-- Utilisation de variables d’état (`isJumping`, `isCrouching`, etc.)pour gérer les différentes actions du personnage.
--Création de hitbox personnalisées via getBoundingClientRect() et ajustement manuel des zones de collision pour plus de précision.
+- Utilisation de variables d’état (`isJumping`, `isCrouching`, etc.) pour gérer les différentes actions du personnage.
+- Création de hitbox personnalisées via getBoundingClientRect() et ajustement manuel des zones de collision pour plus de précision.
 - Tests réguliers et mise en place pour sauvegarder mes progrès en cas de problème.
 ---
 *Projet réalisé par Youssef Hassine
