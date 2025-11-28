@@ -1,6 +1,8 @@
 const rabbit = document.getElementById("rabbit");
 const game = document.getElementById("game");
 const scoreDisplay = document.getElementById("score");
+const bestScoreDisplay = document.getElementById("bestScore");
+const musicBtn = document.getElementById("musicBtn");
 const gameOverScreen = document.getElementById("gameOverScreen");
 const finalScore = document.getElementById("finalScore");
 const restartBtn = document.getElementById("restartBtn");
@@ -17,21 +19,89 @@ let baseBottom = parseInt(window.getComputedStyle(rabbit).bottom);
 let jumpKeyPressed = false;
 let score = 0;
 let gameOver = false;
-let gameStarted = false; 
+let gameStarted = false;
+let obstacleTimeout = null;
+let collisionInterval = null;
+let bestScore = localStorage.getItem("bestScore") || 0;
+let musicPlaying = false;
+let runAnimationInterval = null;
+let gameSpeed = 1; // Vitesse du jeu (1 = normal)
+
+// Créer l'élément audio pour la musique
+const bgMusic = new Audio("music/background.mp3");
+bgMusic.loop = true;
+bgMusic.volume = 0.3;
+
+// Gérer les erreurs de chargement audio
+bgMusic.addEventListener('error', () => {
+ console.log("Fichier audio non trouvé. Mets un fichier MP3 dans le dossier 'music'");
+});
+
+// Animation de course du lapin
+const runFrames = [
+ "url('images/lapin_normal1.png')",
+ "url('images/lapin_normal2.png')",
+ "url('images/lapin_normal.png')",
+ "url('images/lapin_courant.png')"
+];
+const crouchRunFrames = [
+ "url('images/lapin_accroupit.png')",
+ "url('images/lapin_accroupit3.png')",
+ "url('images/lapin_accroupit1.png')"
+];
+let currentFrame = 0;
+let currentCrouchFrame = 0;
+
+function animateRabbitRun() {
+ if (!gameOver && gameStarted && !isJumping) {
+  if (isCrouching) {
+   currentCrouchFrame = (currentCrouchFrame + 1) % crouchRunFrames.length;
+   rabbit.style.backgroundImage = crouchRunFrames[currentCrouchFrame];
+  } else {
+   currentFrame = (currentFrame + 1) % runFrames.length;
+   rabbit.style.backgroundImage = runFrames[currentFrame];
+  }
+ }
+}
+
+// Afficher le meilleur score au chargement
+if (bestScoreDisplay) {
+ bestScoreDisplay.textContent = "Meilleur : " + bestScore;
+} 
 
 function startGame() {
  gameStarted = true;
  startMenu.style.display = "none";
  
- setTimeout(createObstacle, 800);
+ // Démarrer l'animation de course
+ runAnimationInterval = setInterval(animateRabbitRun, 150);
+ 
+ obstacleTimeout = setTimeout(createObstacle, 800);
  updateScore();
- setInterval(checkCollision, 50);
+ collisionInterval = setInterval(checkCollision, 50);
 }
 
 startBtn.addEventListener("click", startGame);
 
+// Gestion du bouton musique
+if (musicBtn) {
+ musicBtn.addEventListener("click", () => {
+  if (musicPlaying) {
+   bgMusic.pause();
+   musicBtn.textContent = "🔇";
+   musicBtn.classList.add("muted");
+   musicPlaying = false;
+  } else {
+   bgMusic.play();
+   musicBtn.textContent = "🎵";
+   musicBtn.classList.remove("muted");
+   musicPlaying = true;
+  }
+ });
+}
+
 document.addEventListener("keydown", (e) => {
- if (!gameStarted) return;
+ if (!gameStarted || gameOver) return;
  
  if ((e.code === "ArrowUp" || e.code === "Space") && !jumpKeyPressed) {
   jumpKeyPressed = true;
@@ -39,15 +109,18 @@ document.addEventListener("keydown", (e) => {
  } else if (e.code === "ArrowDown" && !isJumping && !isCrouching) {
   isCrouching = true;
   rabbit.classList.add("crouch");
+  currentCrouchFrame = 0;
+  rabbit.style.backgroundImage = crouchRunFrames[0];
  }
 });
 
 document.addEventListener("keyup", (e) => {
- if (!gameStarted) return;
+ if (!gameStarted || gameOver) return;
 
  if (e.code === "ArrowDown" && isCrouching) {
   isCrouching = false;
   rabbit.classList.remove("crouch");
+  currentFrame = 0;
  }
  if (e.code === "ArrowUp" || e.code === "Space") jumpKeyPressed = false;
 });
@@ -57,6 +130,7 @@ function jump(timestamp) {
  isJumping = true;
  rabbit.classList.remove("crouch");
  rabbit.classList.add("jump");
+ rabbit.style.backgroundImage = "url('images/lapin_courant.png')";
  isCrouching = false;
  jumpStartTime = null;
  requestAnimationFrame(animateJump);
@@ -74,7 +148,13 @@ function animateJump(timestamp) {
   rabbit.style.bottom = baseBottom + "px";
   isJumping = false;
   rabbit.classList.remove("jump");
-  if (isCrouching) rabbit.classList.add("crouch");
+  if (isCrouching) {
+   rabbit.classList.add("crouch");
+   currentCrouchFrame = 0;
+   rabbit.style.backgroundImage = crouchRunFrames[0];
+  } else {
+   currentFrame = 0;
+  }
  }
 }
 
@@ -84,8 +164,10 @@ function createObstacle() {
  const type = Math.random() < 0.5 ? "rock" : "bird";
  spawnOfType(type);
  
- const next = 900 + Math.random() * 700;
- setTimeout(createObstacle, next);
+ // Réduire le délai entre les obstacles en fonction de la vitesse
+ const baseDelay = 900 + Math.random() * 700;
+ const adjustedDelay = baseDelay / gameSpeed;
+ obstacleTimeout = setTimeout(createObstacle, adjustedDelay);
 }
 
 function spawnOfType(type) {
@@ -93,6 +175,11 @@ function spawnOfType(type) {
 
  const el = document.createElement("div");
  el.classList.add(type === "rock" ? "obstacle" : "bird");
+
+ // Ajuster la durée d'animation en fonction de la vitesse
+ const baseDuration = 3;
+ const adjustedDuration = baseDuration / gameSpeed;
+ el.style.animationDuration = adjustedDuration + "s";
 
  if (type === "rock") {
   el.style.bottom = "20px";
@@ -148,8 +235,14 @@ function checkCollision() {
 
 function getRabbitHitboxCenter() {
  const rect = rabbit.getBoundingClientRect();
- const hitboxWidth = 80;
- const hitboxHeight = 90;
+ let hitboxWidth = 80;
+ let hitboxHeight = 90;
+ 
+ // Réduire la hauteur de la hitbox quand le lapin est accroupi
+ if (isCrouching) {
+  hitboxHeight = 50; // Hitbox plus petite en hauteur
+ }
+ 
  const centerX = rect.left + rect.width / 2;
  const centerY = rect.bottom - hitboxHeight / 2;
  return { x: centerX, y: centerY, width: hitboxWidth, height: hitboxHeight };
@@ -158,16 +251,88 @@ function getRabbitHitboxCenter() {
 function endGame() {
  if (gameOver) return;
  gameOver = true;
+ 
+ // Arrêter l'animation de course
+ if (runAnimationInterval) clearInterval(runAnimationInterval);
+ 
+ // Vérifier et sauvegarder le meilleur score
+ if (score > bestScore) {
+  bestScore = score;
+  localStorage.setItem("bestScore", bestScore);
+  bestScoreDisplay.textContent = "Meilleur : " + bestScore;
+ }
+ 
+ // Arrêter toutes les animations du lapin
+ rabbit.classList.remove("jump", "crouch");
+ rabbit.classList.add("frozen");
+ 
+ // Arrêter l'animation du background
+ game.classList.add("frozen");
+ 
+ // Arrêter toutes les animations des obstacles
+ const obstacles = document.querySelectorAll(".obstacle, .bird");
+ obstacles.forEach(obs => obs.style.animationPlayState = "paused");
+ 
  finalScore.textContent = "Ton score : " + score;
  gameOverScreen.style.display = "flex";
 }
 
-restartBtn.addEventListener("click", () => location.reload());
+restartBtn.addEventListener("click", () => {
+ // Arrêter tous les timers en cours
+ if (obstacleTimeout) clearTimeout(obstacleTimeout);
+ if (collisionInterval) clearInterval(collisionInterval);
+ if (runAnimationInterval) clearInterval(runAnimationInterval);
+ 
+ // Réinitialiser toutes les variables
+ gameOver = false;
+ gameStarted = true;
+ score = 0;
+ gameSpeed = 1; // Réinitialiser la vitesse
+ isJumping = false;
+ isCrouching = false;
+ jumpKeyPressed = false;
+ currentFrame = 0;
+ currentCrouchFrame = 0;
+ 
+ // Réinitialiser l'affichage
+ scoreDisplay.textContent = "Score : 0";
+ gameOverScreen.style.display = "none";
+ startMenu.style.display = "none";
+ 
+ // Nettoyer les obstacles existants
+ const obstacles = document.querySelectorAll(".obstacle, .bird");
+ obstacles.forEach(obs => obs.remove());
+ 
+ // Réinitialiser le lapin
+ rabbit.classList.remove("frozen", "jump", "crouch");
+ rabbit.style.bottom = baseBottom + "px";
+ rabbit.style.backgroundImage = runFrames[0];
+ 
+ // Réactiver l'animation du jeu
+ game.classList.remove("frozen");
+ game.style.animationDuration = "8s"; // Réinitialiser la vitesse du background
+ 
+ // Relancer le jeu
+ runAnimationInterval = setInterval(animateRabbitRun, 150);
+ obstacleTimeout = setTimeout(createObstacle, 800);
+ collisionInterval = setInterval(checkCollision, 50);
+ updateScore();
+});
 
 function updateScore() {
  if (!gameOver && gameStarted) {
   score++;
   scoreDisplay.textContent = "Score : " + score;
+  
+  // Augmenter progressivement la vitesse tous les 100 points
+  // Maximum de 2x la vitesse normale
+  gameSpeed = Math.min(1 + (score / 500), 2);
+  
+  // Accélérer l'animation du background
+  const baseAnimDuration = 8;
+  const adjustedAnimDuration = baseAnimDuration / gameSpeed;
+  game.style.animationDuration = adjustedAnimDuration + "s";
+  
   setTimeout(updateScore, 200);
  } else if (!gameStarted) {
   setTimeout(updateScore, 50); 
