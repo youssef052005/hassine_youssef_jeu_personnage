@@ -23,7 +23,6 @@ body {
  border-bottom: 3px solid #4a3b18;
  background: url("images/map.png") repeat-x;
  background-size: cover;
- animation: scrollBackground 8s linear infinite;
 }
 
 @keyframes scrollBackground {
@@ -178,9 +177,6 @@ body {
  animation: none !important;
  transition: none !important;
 }
-#game.frozen {
- animation-play-state: paused !important;
-}
 #bestScore {
  position: absolute;
  top: 10px;
@@ -218,4 +214,27 @@ body {
 #musicBtn.muted {
  opacity: 0.5;
  background: rgba(255, 0, 0, 0.2);
+}
+#menuMusicBtn {
+ width: 60px;
+ height: 60px;
+ background: rgba(255, 255, 255, 0.2);
+ border: 3px solid #fff;
+ border-radius: 50%;
+ display: flex;
+ justify-content: center;
+ align-items: center;
+ font-size: 32px;
+ cursor: pointer;
+ transition: 0.3s;
+}
+
+#menuMusicBtn:hover {
+ background: rgba(255, 255, 255, 0.4);
+ transform: scale(1.1);
+}
+
+#menuMusicBtn.active {
+ background: rgba(76, 175, 80, 0.4);
+ border-color: #4caf50;
 }

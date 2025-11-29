@@ -3,6 +3,7 @@ const game = document.getElementById("game");
 const scoreDisplay = document.getElementById("score");
 const bestScoreDisplay = document.getElementById("bestScore");
 const musicBtn = document.getElementById("musicBtn");
+const menuMusicBtn = document.getElementById("menuMusicBtn");
 const gameOverScreen = document.getElementById("gameOverScreen");
 const finalScore = document.getElementById("finalScore");
 const restartBtn = document.getElementById("restartBtn");
@@ -26,6 +27,9 @@ let bestScore = localStorage.getItem("bestScore") || 0;
 let musicPlaying = false;
 let runAnimationInterval = null;
 let gameSpeed = 1; // Vitesse du jeu (1 = normal)
+let lastSpeedUpdate = 0; // Pour éviter de mettre à jour trop souvent
+let backgroundPosition = 0;
+let backgroundAnimationFrame = null;
 
 // Créer l'élément audio pour la musique
 const bgMusic = new Audio("music/background.mp3");
@@ -46,7 +50,7 @@ const runFrames = [
 ];
 const crouchRunFrames = [
  "url('images/lapin_accroupit.png')",
- "url('images/lapin_accroupit3.png')",
+ "url('images/lapin_accroupit2.png')",
  "url('images/lapin_accroupit1.png')"
 ];
 let currentFrame = 0;
@@ -67,6 +71,19 @@ function animateRabbitRun() {
 // Afficher le meilleur score au chargement
 if (bestScoreDisplay) {
  bestScoreDisplay.textContent = "Meilleur : " + bestScore;
+}
+
+// Animation fluide du background
+function animateBackground() {
+ if (!gameOver && gameStarted) {
+  // Déplacer le background de façon fluide
+  backgroundPosition -= 2 * gameSpeed; // 2 pixels par frame * vitesse
+  if (backgroundPosition <= -1000) {
+   backgroundPosition = 0; // Reset pour créer une boucle infinie
+  }
+  game.style.backgroundPositionX = backgroundPosition + "px";
+  backgroundAnimationFrame = requestAnimationFrame(animateBackground);
+ }
 } 
 
 function startGame() {
@@ -76,6 +93,9 @@ function startGame() {
  // Démarrer l'animation de course
  runAnimationInterval = setInterval(animateRabbitRun, 150);
  
+ // Démarrer l'animation du background
+ animateBackground();
+ 
  obstacleTimeout = setTimeout(createObstacle, 800);
  updateScore();
  collisionInterval = setInterval(checkCollision, 50);
@@ -83,7 +103,32 @@ function startGame() {
 
 startBtn.addEventListener("click", startGame);
 
-// Gestion du bouton musique
+// Gestion du bouton musique dans le menu
+if (menuMusicBtn) {
+ menuMusicBtn.addEventListener("click", () => {
+  if (musicPlaying) {
+   bgMusic.pause();
+   menuMusicBtn.textContent = "🔇";
+   menuMusicBtn.classList.remove("active");
+   if (musicBtn) {
+    musicBtn.textContent = "🔇";
+    musicBtn.classList.add("muted");
+   }
+   musicPlaying = false;
+  } else {
+   bgMusic.play();
+   menuMusicBtn.textContent = "🎵";
+   menuMusicBtn.classList.add("active");
+   if (musicBtn) {
+    musicBtn.textContent = "🎵";
+    musicBtn.classList.remove("muted");
+   }
+   musicPlaying = true;
+  }
+ });
+}
+
+// Gestion du bouton musique pendant le jeu
 if (musicBtn) {
  musicBtn.addEventListener("click", () => {
   if (musicPlaying) {
@@ -255,6 +300,9 @@ function endGame() {
  // Arrêter l'animation de course
  if (runAnimationInterval) clearInterval(runAnimationInterval);
  
+ // Arrêter l'animation du background
+ if (backgroundAnimationFrame) cancelAnimationFrame(backgroundAnimationFrame);
+ 
  // Vérifier et sauvegarder le meilleur score
  if (score > bestScore) {
   bestScore = score;
@@ -265,9 +313,6 @@ function endGame() {
  // Arrêter toutes les animations du lapin
  rabbit.classList.remove("jump", "crouch");
  rabbit.classList.add("frozen");
- 
- // Arrêter l'animation du background
- game.classList.add("frozen");
  
  // Arrêter toutes les animations des obstacles
  const obstacles = document.querySelectorAll(".obstacle, .bird");
@@ -282,12 +327,15 @@ restartBtn.addEventListener("click", () => {
  if (obstacleTimeout) clearTimeout(obstacleTimeout);
  if (collisionInterval) clearInterval(collisionInterval);
  if (runAnimationInterval) clearInterval(runAnimationInterval);
+ if (backgroundAnimationFrame) cancelAnimationFrame(backgroundAnimationFrame);
  
  // Réinitialiser toutes les variables
  gameOver = false;
  gameStarted = true;
  score = 0;
  gameSpeed = 1; // Réinitialiser la vitesse
+ lastSpeedUpdate = 0;
+ backgroundPosition = 0;
  isJumping = false;
  isCrouching = false;
  jumpKeyPressed = false;
@@ -308,12 +356,12 @@ restartBtn.addEventListener("click", () => {
  rabbit.style.bottom = baseBottom + "px";
  rabbit.style.backgroundImage = runFrames[0];
  
- // Réactiver l'animation du jeu
- game.classList.remove("frozen");
- game.style.animationDuration = "8s"; // Réinitialiser la vitesse du background
+ // Réinitialiser le background
+ game.style.backgroundPositionX = "0px";
  
  // Relancer le jeu
  runAnimationInterval = setInterval(animateRabbitRun, 150);
+ animateBackground();
  obstacleTimeout = setTimeout(createObstacle, 800);
  collisionInterval = setInterval(checkCollision, 50);
  updateScore();
@@ -324,14 +372,8 @@ function updateScore() {
   score++;
   scoreDisplay.textContent = "Score : " + score;
   
-  // Augmenter progressivement la vitesse tous les 100 points
-  // Maximum de 2x la vitesse normale
+  // Augmenter progressivement la vitesse de façon continue
   gameSpeed = Math.min(1 + (score / 500), 2);
-  
-  // Accélérer l'animation du background
-  const baseAnimDuration = 8;
-  const adjustedAnimDuration = baseAnimDuration / gameSpeed;
-  game.style.animationDuration = adjustedAnimDuration + "s";
   
   setTimeout(updateScore, 200);
  } else if (!gameStarted) {
