@@ -50,7 +50,7 @@ const runFrames = [
 ];
 const crouchRunFrames = [
  "url('images/lapin_accroupit.png')",
- "url('images/lapin_accroupit2.png')",
+ "url('images/lapin_accroupit3.png')",
  "url('images/lapin_accroupit1.png')"
 ];
 let currentFrame = 0;
